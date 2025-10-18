@@ -12,9 +12,9 @@ import {
 } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { contractAddress, contractAbi } from "@/lib/constants";
-import { sdk } from "@farcaster/miniapp-sdk"; // 👈 1. ИМПОРТИРУЕМ SDK
+import { sdk } from "@farcaster/miniapp-sdk";
 
-// КОМПОНЕНТ 1: Логотип
+// КОМПОНЕНТ 1: Логотип (без изменений)
 function BaseLogo() {
   return (
     <div className="mx-auto mb-4 w-12 h-12 rounded-xl bg-blue-600 shadow-lg flex items-center justify-center">
@@ -34,12 +34,16 @@ function BaseLogo() {
   );
 }
 
+// ИЗМЕНЕНИЕ 1: Создаем четкий тип для наших сообщений
+type Message = {
+  sender: string;
+  content: string;
+  timestamp: bigint;
+};
+
 // КОМПОНЕНТ 2: Карточка сообщения
-function MessageCard({
-  message,
-}: {
-  message: { sender: string; content: string; timestamp: bigint };
-}) {
+function MessageCard({ message }: { message: Message }) {
+  // Используем наш новый тип
   const shortAddress = `${message.sender.substring(
     0,
     6
@@ -48,7 +52,10 @@ function MessageCard({
 
   return (
     <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md animate-fade-in">
-      <p className="text-gray-800 break-words text-lg">"{message.content}"</p>
+      {/* ИЗМЕНЕНИЕ 2: Заменяем обычные кавычки на HTML-сущности */}
+      <p className="text-gray-800 break-words text-lg">
+        &ldquo;{message.content}&rdquo;
+      </p>
       <div className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
         <span>
           By:{" "}
@@ -106,21 +113,31 @@ export default function HomePage() {
     query: { enabled: totalMessages > 0 },
   });
 
-  const messages =
+  // ИЗМЕНЕНИЕ 3: Безопасно обрабатываем данные с четкими типами, убираем 'any'
+  const messages: Message[] =
     messagesData
-      ?.map((msg) => msg.result)
-      .filter(Boolean)
-      .map((msgArray) => ({
-        sender: (msgArray as any)[0],
-        content: (msgArray as any)[1],
-        timestamp: (msgArray as any)[2],
-      })) || [];
+      ?.map((msg) => {
+        if (Array.isArray(msg.result) && msg.result.length === 3) {
+          // Явно указываем типы для каждого элемента массива
+          const [sender, content, timestamp] = msg.result as [
+            string,
+            string,
+            bigint
+          ];
+          return { sender, content, timestamp };
+        }
+        return null;
+      })
+      .filter((msg): msg is Message => msg !== null) || [];
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
     setIsClient(true);
+  }, []);
+  useEffect(() => {
+    sdk.actions.ready();
   }, []);
 
   useEffect(() => {
@@ -129,12 +146,6 @@ export default function HomePage() {
       setMessage("");
     }
   }, [isConfirmed, refetchTotal, refetchMessages]);
-
-  // 👈 2. ДОБАВЛЯЕМ ЭТОТ БЛОК
-  useEffect(() => {
-    // Сообщаем Farcaster, что приложение готово к отображению
-    sdk.actions.ready();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
