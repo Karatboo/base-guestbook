@@ -14,39 +14,44 @@ import {
   zerionWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider, createConfig, http } from "wagmi";
+import { WagmiProvider, createConfig, http, createStorage } from "wagmi"; // ✅ 1. Импортируем createStorage
 import { base } from "wagmi/chains";
 
-// Определяем список кошельков, которые мы хотим показывать в интерфейсе RainbowKit
 const connectors = connectorsForWallets(
   [
     {
       groupName: "Suggested",
       wallets: [
-        injectedWallet, // Самый важный для Farcaster и мобильных браузеров
+        injectedWallet,
         metaMaskWallet,
         coinbaseWallet,
         rabbyWallet,
         zerionWallet,
-        walletConnectWallet, // Для всех остальных (включая Trust Wallet)
+        walletConnectWallet,
       ],
     },
   ],
   {
     appName: "Onchain Guestbook",
-    // Убедитесь, что здесь ваш правильный Project ID
     projectId: "9938872d5c52cb2a3e117c606d1dec14",
   }
 );
 
 // ✅ ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ
-// Создаем конфигурацию wagmi с включенным "супер-режимом" обнаружения
 const config = createConfig({
   connectors,
   chains: [base],
   transports: { [base.id]: http() },
-  // Эта строчка принудительно включает обнаружение ВСЕХ установленных кошельков (EIP-6963)
+  // Включаем обнаружение всех кошельков
   multiInjectedProviderDiscovery: true,
+
+  // ✅ 2. Включаем "постоянную память" (State Persistence)
+  // Wagmi будет сохранять состояние подключения в localStorage браузера.
+  storage: createStorage({ storage: window.localStorage }),
+
+  // ✅ 3. Включаем поддержку Server-Side Rendering (SSR)
+  // Это обязательно для Next.js, чтобы избежать ошибок гидратации при авто-переподключении.
+  ssr: true,
 });
 
 const queryClient = new QueryClient();
