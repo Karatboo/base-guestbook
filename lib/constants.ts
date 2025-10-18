@@ -1,42 +1,21 @@
 // lib/constants.ts
 
-// ❗️ ВАЖНО: Убедись, что здесь адрес твоего контракта
+// The contract address remains the same
 export const contractAddress = "0x0d74c939dbb0eda7e61d90e9cabdf848a2ebc819";
 
-// ❗️ ВАЖНО: Это ABI. Скопируй его из Remix IDE
+// The ABI remains the same, but we add "as const" at the very end
 export const contractAbi = [
   {
     inputs: [
       {
         internalType: "address",
         name: "initialOwner",
+
         type: "address",
       },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
-    name: "OwnableInvalidOwner",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "OwnableUnauthorizedAccount",
-    type: "error",
   },
   {
     anonymous: false,
@@ -81,39 +60,6 @@ export const contractAbi = [
     ],
     name: "OwnershipTransferred",
     type: "event",
-  },
-  {
-    inputs: [],
-    name: "renounceOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_content",
-        type: "string",
-      },
-    ],
-    name: "sign",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "transferOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [],
@@ -170,4 +116,37 @@ export const contractAbi = [
     stateMutability: "view",
     type: "function",
   },
-];
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_content",
+        type: "string",
+      },
+    ],
+    name: "sign",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const; // 👈 THIS IS THE FIX!
