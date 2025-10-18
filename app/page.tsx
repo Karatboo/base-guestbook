@@ -12,7 +12,7 @@ import {
   useSwitchChain,
 } from "wagmi";
 import { base } from "wagmi/chains";
-// ✅ ИЗМЕНЕНИЕ 1: Удаляем импорт `injected` отсюда
+// ✅ 3. Удаляем импорт `injected` отсюда, он больше не нужен
 import { contractAddress, contractAbi } from "@/lib/constants";
 import { sdk } from "@farcaster/miniapp-sdk";
 
@@ -98,7 +98,7 @@ export default function HomePage() {
   const [message, setMessage] = useState("");
   const { address, isConnected, chain } = useAccount();
 
-  // ✅ ИЗМЕНЕНИЕ 2: Получаем готовые `connectors` из хука
+  // ✅ 4. Получаем `connectors` из хука, чтобы использовать уже готовый
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
 
@@ -206,7 +206,7 @@ export default function HomePage() {
           </div>
         ) : (
           <button
-            // ✅ ИЗМЕНЕНИЕ 3: Используем первый доступный коннектор из списка
+            // ✅ 5. Используем первый (и единственный) коннектор из списка, который мы настроили в providers.tsx
             onClick={() => connect({ connector: connectors[0] })}
             className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-px bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-700"
           >
