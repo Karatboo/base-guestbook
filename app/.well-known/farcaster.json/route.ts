@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   // ❗️ ЗАМЕНИ 'your-vercel-url.vercel.app' НА СВОЙ РЕАЛЬНЫЙ URL VERCEL
-  const appUrl = "https://base-guestbook-твой-логин.vercel.app";
+  const appUrl = "https://base-guestbook-nyaw.vercel.app/";
 
   const manifest = {
     // Это поле для верификации. Мы заполним его на следующем шаге. Пока оставляем пустым.
@@ -25,7 +25,7 @@ export async function GET() {
       iconUrl: "https://i.ibb.co/hKCoPz9/base-logo-square-1.png", // Я подготовил для тебя иконку
       splashImageUrl: "https://i.ibb.co/L5h5zqs/base-guestbook-splash.png", // И сплэш-скрин
       splashBackgroundColor: "#0052FF",
-      subtitle: "Leave your permanent mark on the Base blockchain.",
+      subtitle: "Leave your mark onchain.",
       description:
         "A simple and secure digital guestbook where anyone can sign a message that gets stored forever onchain. Powered by Base.",
       screenshotUrls: [
