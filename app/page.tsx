@@ -34,7 +34,6 @@ function BaseLogo() {
   );
 }
 
-// ИЗМЕНЕНИЕ 1: Создаем четкий тип для наших сообщений
 type Message = {
   sender: string;
   content: string;
@@ -43,7 +42,6 @@ type Message = {
 
 // КОМПОНЕНТ 2: Карточка сообщения
 function MessageCard({ message }: { message: Message }) {
-  // Используем наш новый тип
   const shortAddress = `${message.sender.substring(
     0,
     6
@@ -52,7 +50,6 @@ function MessageCard({ message }: { message: Message }) {
 
   return (
     <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md animate-fade-in">
-      {/* ИЗМЕНЕНИЕ 2: Заменяем обычные кавычки на HTML-сущности */}
       <p className="text-gray-800 break-words text-lg">
         &ldquo;{message.content}&rdquo;
       </p>
@@ -113,13 +110,12 @@ export default function HomePage() {
     query: { enabled: totalMessages > 0 },
   });
 
-  // ИЗМЕНЕНИЕ 3: Безопасно обрабатываем данные с четкими типами, убираем 'any'
   const messages: Message[] =
     messagesData
       ?.map((msg) => {
         if (Array.isArray(msg.result) && msg.result.length === 3) {
-          // Явно указываем типы для каждого элемента массива
-          const [sender, content, timestamp] = msg.result as [
+          // 👇 ЭТА СТРОЧКА ИЗМЕНЕНА! Добавлено `as unknown`
+          const [sender, content, timestamp] = msg.result as unknown as [
             string,
             string,
             bigint
