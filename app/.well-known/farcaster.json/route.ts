@@ -21,7 +21,7 @@ export async function GET() {
       name: "Onchain Guestbook",
       homeUrl: appUrl,
       iconUrl: `${appUrl}icon.png`,
-      splashImageUrl: "https://i.ibb.co/L5h5zqs/base-guestbook-splash.png", // И сплэш-скрин
+      splashImageUrl: "https://i.ibb.co/FdM8931/icon.png", // И сплэш-скрин
       splashBackgroundColor: "#0052FF",
       subtitle: "Leave your mark onchain.",
       description:

@@ -5,18 +5,20 @@ import { Providers } from "@/lib/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Убедитесь, что здесь ваш правильный URL
 const appUrl = "https://base-guestbook-nyaw.vercel.app/";
 
 export async function generateMetadata(): Promise<Metadata> {
-  // This is the JSON object Farcaster expects for a Mini App embed
+  const SPLASH_IMAGE_URL = "https://i.ibb.co/FdM8931/icon.png";
+
   const miniAppManifest = {
     version: "next",
-    imageUrl: "https://i.ibb.co/L5h5zqs/base-guestbook-splash.png", // The main image for the cast
+    imageUrl: SPLASH_IMAGE_URL, // Обновлено здесь
     button: {
       title: "Sign the Guestbook",
       action: {
         type: "launch_miniapp",
-        name: "Onchain Guestbook", // The name that appears when launching
+        name: "Onchain Guestbook",
         url: appUrl,
       },
     },
@@ -26,14 +28,12 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Onchain Guestbook",
     description: "Leave your permanent mark on the Base blockchain.",
 
-    // Standard OpenGraph tags for better sharing on other platforms (Twitter, Discord, etc.)
     openGraph: {
       title: "Onchain Guestbook",
       description: "Leave your permanent mark on the Base blockchain.",
       images: [miniAppManifest.imageUrl],
     },
 
-    // The single, correct meta tag for Farcaster Mini Apps
     other: {
       "fc:miniapp": JSON.stringify(miniAppManifest),
     },
