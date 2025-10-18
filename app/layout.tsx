@@ -5,10 +5,9 @@ import { Providers } from "@/lib/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// ❗️ ВАЖНО: ЗАМЕНИ 'your-vercel-url.vercel.app' НА СВОЙ РЕАЛЬНЫЙ URL VERCEL
-const appUrl = "https://base-guestbook-твой-логин.vercel.app";
+// Убедитесь, что здесь ваш правильный URL
+const appUrl = "https://base-guestbook-nyaw.vercel.app/";
 
-// 👇 ДОБАВЛЯЕМ ЭТУ ФУНКЦИЮ
 export async function generateMetadata(): Promise<Metadata> {
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
@@ -16,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "fc:frame:button:1": "Sign the Guestbook!",
     "fc:frame:post_url": appUrl,
     "fc:miniapp:name": "Onchain Guestbook",
-    "fc:miniapp:image": "https://i.ibb.co/hKCoPz9/base-logo-square-1.png",
+    "fc:miniapp:image": `${appUrl}icon.png`,
     "fc:miniapp:url": appUrl,
   };
 

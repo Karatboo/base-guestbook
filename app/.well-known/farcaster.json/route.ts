@@ -14,15 +14,13 @@ export async function GET() {
         "LuBHmyOFe3VMiB8Krx/8bdtH7T4rlN94WzbbLRfZvqNSbgvkxN3BAzGZE/5RGg66poVtpGfC/vG2gCf4k/1vpxw=",
     },
     baseBuilder: {
-      // ❗️ Вставь сюда адрес своего кошелька, с которого ты деплоил контракт.
-      // Это даст тебе права на редактирование в будущем.
       allowedAddresses: ["0xaD5460EFAF11D4c34edFb8c0BbBDC660754084CB"],
     },
     miniapp: {
       version: "1",
       name: "Onchain Guestbook",
       homeUrl: appUrl,
-      iconUrl: "https://i.ibb.co/hKCoPz9/base-logo-square-1.png", // Я подготовил для тебя иконку
+      iconUrl: `${appUrl}icon.png`,
       splashImageUrl: "https://i.ibb.co/L5h5zqs/base-guestbook-splash.png", // И сплэш-скрин
       splashBackgroundColor: "#0052FF",
       subtitle: "Leave your mark onchain.",
