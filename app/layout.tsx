@@ -5,15 +5,14 @@ import { Providers } from "@/lib/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// Убедитесь, что здесь ваш правильный URL
 const appUrl = "https://base-guestbook-nyaw.vercel.app/";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const SPLASH_IMAGE_URL = "https://i.ibb.co/FdM8931/icon.png";
+  const SPLASH_IMAGE_URL = "https://i.ibb.co/T0gT1V7/image.png";
 
   const miniAppManifest = {
     version: "next",
-    imageUrl: SPLASH_IMAGE_URL, // Обновлено здесь
+    imageUrl: SPLASH_IMAGE_URL,
     button: {
       title: "Sign the Guestbook",
       action: {
@@ -27,13 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Onchain Guestbook",
     description: "Leave your permanent mark on the Base blockchain.",
-
     openGraph: {
       title: "Onchain Guestbook",
       description: "Leave your permanent mark on the Base blockchain.",
       images: [miniAppManifest.imageUrl],
     },
-
     other: {
       "fc:miniapp": JSON.stringify(miniAppManifest),
     },
@@ -47,6 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      {/* ✅ Убираем отсюда класс фона */}
       <body className={`${inter.className}`}>
         <Providers>{children}</Providers>
       </body>

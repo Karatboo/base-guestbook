@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import {
   useAccount,
-  useConnect,
-  useDisconnect,
   useReadContract,
   useReadContracts,
   useWriteContract,
@@ -12,9 +10,9 @@ import {
   useSwitchChain,
 } from "wagmi";
 import { base } from "wagmi/chains";
-// ✅ 3. Удаляем импорт `injected` отсюда, он больше не нужен
 import { contractAddress, contractAbi } from "@/lib/constants";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { ConnectButton } from "@rainbow-me/rainbowkit"; // ✅ Импортируем кнопку от RainbowKit
 
 // КОМПОНЕНТ 1: Логотип (без изменений)
 function BaseLogo() {
@@ -73,7 +71,7 @@ function MessageCard({ message }: { message: Message }) {
   );
 }
 
-// КОМПОНЕНТ 3: Баннер "Неправильная сеть" (без изменений)
+// КОМПОНЕНТ 3: Баннер "Неправильная сеть" - теперь будет управляться RainbowKit, но оставим его как запасной вариант
 function WrongNetworkBanner() {
   const { switchChain } = useSwitchChain();
   return (
@@ -96,11 +94,8 @@ function WrongNetworkBanner() {
 export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [message, setMessage] = useState("");
+  // ✅ Удаляем `useConnect` и `useDisconnect`, так как RainbowKit управляет этим
   const { address, isConnected, chain } = useAccount();
-
-  // ✅ 4. Получаем `connectors` из хука, чтобы использовать уже готовый
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
 
   const {
     data: hash,
@@ -108,13 +103,13 @@ export default function HomePage() {
     isPending: isWritePending,
   } = useWriteContract();
 
+  // ... остальная логика хуков остается без изменений ...
   const { data: totalMessagesData, refetch: refetchTotal } = useReadContract({
     address: contractAddress,
     abi: contractAbi,
     functionName: "getTotalMessages",
   });
   const totalMessages = totalMessagesData ? Number(totalMessagesData) : 0;
-
   const messageContracts = Array.from({ length: totalMessages }).map(
     (_, index) => ({
       address: contractAddress,
@@ -123,7 +118,6 @@ export default function HomePage() {
       args: [BigInt(index)],
     })
   );
-
   const {
     data: messagesData,
     refetch: refetchMessages,
@@ -132,7 +126,6 @@ export default function HomePage() {
     contracts: messageContracts,
     query: { enabled: totalMessages > 0 },
   });
-
   const messages: Message[] =
     messagesData
       ?.map((msg) => {
@@ -147,17 +140,14 @@ export default function HomePage() {
         return null;
       })
       .filter((msg): msg is Message => msg !== null) || [];
-
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
-
   useEffect(() => {
     setIsClient(true);
   }, []);
   useEffect(() => {
     sdk.actions.ready();
   }, []);
-
   useEffect(() => {
     if (isConfirmed) {
       refetchTotal().then(() => refetchMessages());
@@ -191,30 +181,12 @@ export default function HomePage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
           Onchain Guestbook
         </h1>
-        {isConnected ? (
-          <div className="flex items-center space-x-3">
-            <span className="text-sm text-gray-600 hidden sm:block font-mono">{`${address?.substring(
-              0,
-              6
-            )}...${address?.substring(address.length - 4)}`}</span>
-            <button
-              onClick={() => disconnect()}
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm transition-all duration-200 ease-in-out hover:border-gray-400 hover:shadow-md hover:-translate-y-px"
-            >
-              Disconnect
-            </button>
-          </div>
-        ) : (
-          <button
-            // ✅ 5. Используем первый (и единственный) коннектор из списка, который мы настроили в providers.tsx
-            onClick={() => connect({ connector: connectors[0] })}
-            className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-px bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-700"
-          >
-            Connect Wallet
-          </button>
-        )}
+        {/* ✅ ЗАМЕНЯЕМ ВСЮ ЛОГИКУ КНОПКИ НА ОДИН КОМПОНЕНТ */}
+        <ConnectButton />
       </header>
 
+      {/* RainbowKit имеет свой собственный, более удобный UI для смены сети,
+          поэтому этот баннер будет показываться реже, но мы его оставим */}
       {isWrongNetwork && <WrongNetworkBanner />}
 
       {isConnected && (
