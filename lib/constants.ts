@@ -1,9 +1,11 @@
 // lib/constants.ts
 
-// The contract address remains the same
-export const contractAddress = "0x0d74c939dbb0eda7e61d90e9cabdf848a2ebc819";
+// ИЗМЕНЕНИЕ: Мы добавляем : `0x${string}` после имени переменной.
+// Это говорит TypeScript, что это не просто строка, а строка типа "адрес".
+export const contractAddress: `0x${string}` =
+  "0x0d74c939dbb0eda7e61d90e9cabdf848a2ebc819";
 
-// The ABI remains the same, but we add "as const" at the very end
+// The ABI remains the same, with "as const"
 export const contractAbi = [
   {
     inputs: [
@@ -149,4 +151,4 @@ export const contractAbi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-] as const; // 👈 THIS IS THE FIX!
+] as const;
