@@ -71,7 +71,7 @@ function MessageCard({ message }: { message: Message }) {
   );
 }
 
-// КОМПОНЕНТ 3: Баннер "Неправильная сеть" - теперь будет управляться RainbowKit, но оставим его как запасной вариант
+// КОМПОНЕНТ 3: Баннер "Неправильная сеть" - теперь будет управляться RainbowKit
 function WrongNetworkBanner() {
   const { switchChain } = useSwitchChain();
   return (
@@ -103,7 +103,6 @@ export default function HomePage() {
     isPending: isWritePending,
   } = useWriteContract();
 
-  // ... остальная логика хуков остается без изменений ...
   const { data: totalMessagesData, refetch: refetchTotal } = useReadContract({
     address: contractAddress,
     abi: contractAbi,
@@ -185,8 +184,7 @@ export default function HomePage() {
         <ConnectButton />
       </header>
 
-      {/* RainbowKit имеет свой собственный, более удобный UI для смены сети,
-          поэтому этот баннер будет показываться реже, но мы его оставим */}
+      {/* RainbowKit имеет свой собственный, более удобный UI для смены сети */}
       {isWrongNetwork && <WrongNetworkBanner />}
 
       {isConnected && (
