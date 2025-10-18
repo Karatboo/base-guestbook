@@ -7,9 +7,11 @@ export async function GET() {
   const manifest = {
     // Это поле для верификации. Мы заполним его на следующем шаге. Пока оставляем пустым.
     accountAssociation: {
-      header: "",
-      payload: "",
-      signature: "",
+      header:
+        "eyJmaWQiOjQ2NzY1MCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDEzMjI0ODNkNEJENzVGYmU1N2U5QUIwNDBiNTllMTZlZTExNjgxMTQifQ",
+      payload: "eyJkb21haW4iOiJiYXNlLWd1ZXN0Ym9vay1ueWF3LnZlcmNlbC5hcHAifQ",
+      signature:
+        "LuBHmyOFe3VMiB8Krx/8bdtH7T4rlN94WzbbLRfZvqNSbgvkxN3BAzGZE/5RGg66poVtpGfC/vG2gCf4k/1vpxw=",
     },
     baseBuilder: {
       // ❗️ Вставь сюда адрес своего кошелька, с которого ты деплоил контракт.
