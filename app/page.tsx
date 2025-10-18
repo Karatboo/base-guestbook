@@ -12,7 +12,7 @@ import {
   useSwitchChain,
 } from "wagmi";
 import { base } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
+// ✅ ИЗМЕНЕНИЕ 1: Удаляем импорт `injected` отсюда
 import { contractAddress, contractAbi } from "@/lib/constants";
 import { sdk } from "@farcaster/miniapp-sdk";
 
@@ -73,7 +73,7 @@ function MessageCard({ message }: { message: Message }) {
   );
 }
 
-// КОМПОНЕНТ 3: Баннер "Неправильная сеть"
+// КОМПОНЕНТ 3: Баннер "Неправильная сеть" (без изменений)
 function WrongNetworkBanner() {
   const { switchChain } = useSwitchChain();
   return (
@@ -97,7 +97,9 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [message, setMessage] = useState("");
   const { address, isConnected, chain } = useAccount();
-  const { connect } = useConnect();
+
+  // ✅ ИЗМЕНЕНИЕ 2: Получаем готовые `connectors` из хука
+  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
 
   const {
@@ -171,7 +173,6 @@ export default function HomePage() {
       abi: contractAbi,
       functionName: "sign",
       args: [message],
-      // ✅ ИЗМЕНЕНИЕ 1: Принудительно указываем, что транзакция должна быть в сети Base
       chainId: base.id,
     });
   };
@@ -205,7 +206,8 @@ export default function HomePage() {
           </div>
         ) : (
           <button
-            onClick={() => connect({ connector: injected() })}
+            // ✅ ИЗМЕНЕНИЕ 3: Используем первый доступный коннектор из списка
+            onClick={() => connect({ connector: connectors[0] })}
             className="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-px bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-700"
           >
             Connect Wallet
@@ -215,7 +217,6 @@ export default function HomePage() {
 
       {isWrongNetwork && <WrongNetworkBanner />}
 
-      {/* Мы больше не используем обертку с opacity, так как блокируем кнопку напрямую */}
       {isConnected && (
         <div className="mb-8">
           <form
@@ -235,7 +236,6 @@ export default function HomePage() {
             />
             <button
               type="submit"
-              // ✅ ИЗМЕНЕНИЕ 2: Явно блокируем кнопку, если сеть неправильная
               disabled={isWrongNetwork || isSigning || !message.trim()}
               className="w-full mt-4 px-4 py-3 font-bold text-white bg-blue-600 rounded-lg shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-0.5 disabled:bg-gray-400 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 bg-gradient-to-r from-blue-600 to-blue-800 border border-blue-700"
             >
