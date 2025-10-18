@@ -9,7 +9,9 @@ import {
   useReadContracts,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSwitchChain,
 } from "wagmi";
+import { base } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 import { contractAddress, contractAbi } from "@/lib/constants";
 import { sdk } from "@farcaster/miniapp-sdk";
@@ -40,7 +42,7 @@ type Message = {
   timestamp: bigint;
 };
 
-// КОМПОНЕНТ 2: Карточка сообщения
+// КОМПОНЕНТ 2: Карточка сообщения (без изменений)
 function MessageCard({ message }: { message: Message }) {
   const shortAddress = `${message.sender.substring(
     0,
@@ -71,11 +73,30 @@ function MessageCard({ message }: { message: Message }) {
   );
 }
 
-// КОМПОНЕНТ 3: Главная страница
+// КОМПОНЕНТ 3: Баннер "Неправильная сеть"
+function WrongNetworkBanner() {
+  const { switchChain } = useSwitchChain();
+  return (
+    <div className="mb-8 p-4 rounded-lg bg-red-50 border border-red-200 text-center shadow-md">
+      <p className="font-semibold text-red-800">Wrong Network Detected</p>
+      <p className="text-sm text-red-600 mb-3">
+        Please switch to the Base network to use this app.
+      </p>
+      <button
+        onClick={() => switchChain({ chainId: base.id })}
+        className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-colors"
+      >
+        Switch to Base
+      </button>
+    </div>
+  );
+}
+
+// КОМПОНЕНТ 4: Главная страница
 export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [message, setMessage] = useState("");
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chain } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
 
@@ -114,7 +135,6 @@ export default function HomePage() {
     messagesData
       ?.map((msg) => {
         if (Array.isArray(msg.result) && msg.result.length === 3) {
-          // 👇 ЭТА СТРОЧКА ИЗМЕНЕНА! Добавлено `as unknown`
           const [sender, content, timestamp] = msg.result as unknown as [
             string,
             string,
@@ -151,10 +171,13 @@ export default function HomePage() {
       abi: contractAbi,
       functionName: "sign",
       args: [message],
+      // ✅ ИЗМЕНЕНИЕ 1: Принудительно указываем, что транзакция должна быть в сети Base
+      chainId: base.id,
     });
   };
 
   const isSigning = isWritePending || isConfirming;
+  const isWrongNetwork = isConnected && chain?.id !== base.id;
 
   if (!isClient) {
     return null;
@@ -190,6 +213,9 @@ export default function HomePage() {
         )}
       </header>
 
+      {isWrongNetwork && <WrongNetworkBanner />}
+
+      {/* Мы больше не используем обертку с opacity, так как блокируем кнопку напрямую */}
       {isConnected && (
         <div className="mb-8">
           <form
@@ -209,10 +235,15 @@ export default function HomePage() {
             />
             <button
               type="submit"
-              disabled={isSigning || !message.trim()}
+              // ✅ ИЗМЕНЕНИЕ 2: Явно блокируем кнопку, если сеть неправильная
+              disabled={isWrongNetwork || isSigning || !message.trim()}
               className="w-full mt-4 px-4 py-3 font-bold text-white bg-blue-600 rounded-lg shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-0.5 disabled:bg-gray-400 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 bg-gradient-to-r from-blue-600 to-blue-800 border border-blue-700"
             >
-              {isSigning ? "Signing..." : "Sign the Guestbook"}
+              {isWrongNetwork
+                ? "Wrong Network"
+                : isSigning
+                ? "Signing..."
+                : "Sign the Guestbook"}
             </button>
             {hash && (
               <div className="mt-3 text-center text-xs text-gray-500">
