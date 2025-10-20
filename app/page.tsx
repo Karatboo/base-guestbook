@@ -19,7 +19,7 @@ type Message = {
   timestamp: bigint;
 };
 
-// ✅ Новый, улучшенный компонент карточки сообщения
+// ✅ Новый улучшенный компонент карточки сообщения
 function MessageCard({ message }: { message: Message }) {
   const shortAddress = `${message.sender.substring(
     0,
