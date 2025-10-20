@@ -3,24 +3,7 @@
 @tailwind utilities;
 
 body {
-  /* Улучшенный градиентный фон в стиле Base */
   background-color: #f0f4f9;
-  background-image: linear-gradient(180deg, #eff5ff 0%, #ffffff 100%);
-  min-height: 100vh;
-}
-
-/* Анимация появления */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  font-family: sans-serif;
+  color: #1a1a1a;
 }

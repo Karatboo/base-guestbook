@@ -7,32 +7,11 @@ import {
   useReadContracts,
   useWriteContract,
   useWaitForTransactionReceipt,
-  useSwitchChain,
 } from "wagmi";
 import { base } from "wagmi/chains";
 import { contractAddress, contractAbi } from "@/lib/constants";
 import { sdk } from "@farcaster/miniapp-sdk";
-import { ConnectButton } from "@rainbow-me/rainbowkit"; // ✅ Импортируем кнопку от RainbowKit
-
-// КОМПОНЕНТ 1: Логотип (без изменений)
-function BaseLogo() {
-  return (
-    <div className="mx-auto mb-4 w-12 h-12 rounded-xl bg-blue-600 shadow-lg flex items-center justify-center">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 48 48"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M24 34.32C18.3006 34.32 13.68 29.6994 13.68 24C13.68 18.3006 18.3006 13.68 24 13.68C29.6994 13.68 34.32 18.3006 34.32 24C34.32 25.4216 34.0345 26.776 33.5283 28.0243C33.4588 28.196 33.2389 28.2862 33.0672 28.2167L30.1332 26.9657C29.9328 26.8851 29.8327 26.6548 29.9132 26.4544C30.2974 25.643 30.504 24.7431 30.504 23.7936C30.504 20.1833 27.5691 17.2464 24 17.2464C20.4309 17.2464 17.496 20.1833 17.496 23.7936C17.496 27.4038 20.4309 30.3408 24 30.3408C25.071 30.3408 26.0963 30.0768 26.9818 29.6102C27.1723 29.5101 27.4026 29.5906 27.4832 29.791L28.9056 33.125C28.9861 33.3254 28.886 33.5557 28.6856 33.6363C27.2793 34.093 25.698 34.32 24 34.32Z"
-          fill="white"
-        />
-      </svg>
-    </div>
-  );
-}
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type Message = {
   sender: string;
@@ -40,61 +19,47 @@ type Message = {
   timestamp: bigint;
 };
 
-// КОМПОНЕНТ 2: Карточка сообщения (без изменений)
+// ✅ Новый, улучшенный компонент карточки сообщения
 function MessageCard({ message }: { message: Message }) {
   const shortAddress = `${message.sender.substring(
     0,
     6
   )}...${message.sender.substring(message.sender.length - 4)}`;
-  const date = new Date(Number(message.timestamp) * 1000).toLocaleString();
+  const date = new Date(Number(message.timestamp) * 1000).toLocaleString(
+    undefined,
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md animate-fade-in">
-      <p className="text-gray-800 break-words text-lg">
+    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm animate-fade-in space-y-3">
+      <p className="text-gray-800 text-lg leading-relaxed">
         &ldquo;{message.content}&rdquo;
       </p>
-      <div className="text-sm text-gray-500 mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-        <span>
-          By:{" "}
-          <a
-            href={`https://basescan.org/address/${message.sender}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline font-medium"
-          >
-            {shortAddress}
-          </a>
-        </span>
+      <div className="text-xs text-gray-400 flex justify-between items-center pt-3 border-t border-gray-100">
+        <a
+          href={`https://basescan.org/address/${message.sender}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono hover:text-blue-600 transition-colors"
+        >
+          {shortAddress}
+        </a>
         <span className="font-mono">{date}</span>
       </div>
     </div>
   );
 }
 
-// КОМПОНЕНТ 3: Баннер "Неправильная сеть" - теперь будет управляться RainbowKit
-function WrongNetworkBanner() {
-  const { switchChain } = useSwitchChain();
-  return (
-    <div className="mb-8 p-4 rounded-lg bg-red-50 border border-red-200 text-center shadow-md">
-      <p className="font-semibold text-red-800">Wrong Network Detected</p>
-      <p className="text-sm text-red-600 mb-3">
-        Please switch to the Base network to use this app.
-      </p>
-      <button
-        onClick={() => switchChain({ chainId: base.id })}
-        className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-colors"
-      >
-        Switch to Base
-      </button>
-    </div>
-  );
-}
-
-// КОМПОНЕНТ 4: Главная страница
+// ✅ Полностью переработанный главный компонент
 export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [message, setMessage] = useState("");
-  // ✅ Удаляем `useConnect` и `useDisconnect`, так как RainbowKit управляет этим
   const { address, isConnected, chain } = useAccount();
 
   const {
@@ -102,7 +67,6 @@ export default function HomePage() {
     writeContract,
     isPending: isWritePending,
   } = useWriteContract();
-
   const { data: totalMessagesData, refetch: refetchTotal } = useReadContract({
     address: contractAddress,
     abi: contractAbi,
@@ -141,6 +105,7 @@ export default function HomePage() {
       .filter((msg): msg is Message => msg !== null) || [];
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -169,86 +134,85 @@ export default function HomePage() {
   const isSigning = isWritePending || isConfirming;
   const isWrongNetwork = isConnected && chain?.id !== base.id;
 
-  if (!isClient) {
-    return null;
-  }
+  if (!isClient) return null;
 
   return (
-    <main className="container mx-auto max-w-2xl p-4 sm:p-6 lg:p-8 font-sans">
-      <BaseLogo />
-      <header className="flex justify-between items-center mb-8 bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-white/30 shadow-lg">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-          Onchain Guestbook
-        </h1>
-        {/* ✅ ЗАМЕНЯЕМ ВСЮ ЛОГИКУ КНОПКИ НА ОДИН КОМПОНЕНТ */}
-        <ConnectButton />
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <main className="container mx-auto max-w-xl p-4 sm:p-6 space-y-8">
+        <header className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Onchain Guestbook
+          </h1>
+          <ConnectButton
+            chainStatus="icon"
+            showBalance={false}
+            accountStatus={{ smallScreen: "avatar", largeScreen: "full" }}
+          />
+        </header>
 
-      {/* RainbowKit имеет свой собственный, более удобный UI для смены сети */}
-      {isWrongNetwork && <WrongNetworkBanner />}
-
-      {isConnected && (
-        <div className="mb-8">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded-lg border border-gray-200 shadow-md"
-          >
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Leave Your Mark on Base
-            </h2>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Write your message here..."
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
-              rows={4}
-              maxLength={280}
-            />
-            <button
-              type="submit"
-              disabled={isWrongNetwork || isSigning || !message.trim()}
-              className="w-full mt-4 px-4 py-3 font-bold text-white bg-blue-600 rounded-lg shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-0.5 disabled:bg-gray-400 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 bg-gradient-to-r from-blue-600 to-blue-800 border border-blue-700"
-            >
-              {isWrongNetwork
-                ? "Wrong Network"
-                : isSigning
-                ? "Signing..."
-                : "Sign the Guestbook"}
-            </button>
-            {hash && (
-              <div className="mt-3 text-center text-xs text-gray-500">
-                Tx:{" "}
-                <a
-                  href={`https://basescan.org/tx/${hash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {hash.substring(0, 10)}...
-                </a>
-              </div>
-            )}
-          </form>
-        </div>
-      )}
-
-      <div className="space-y-4">
-        <h3 className="text-2xl font-bold text-gray-800">
-          Messages ({totalMessages})
-        </h3>
-        {areMessagesLoading && (
-          <p className="text-center text-gray-500">Loading messages...</p>
+        {isConnected && (
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <form onSubmit={handleSubmit}>
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                Leave Your Mark on Base
+              </h2>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Write your message here..."
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none"
+                rows={4}
+                maxLength={280}
+              />
+              <button
+                type="submit"
+                disabled={isWrongNetwork || isSigning || !message.trim()}
+                className="w-full mt-4 px-4 py-3 font-semibold text-white bg-blue-600 rounded-lg shadow-sm transition-all duration-300 ease-in-out hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                {isWrongNetwork
+                  ? "Wrong Network"
+                  : isSigning
+                  ? "Signing..."
+                  : "Sign the Guestbook"}
+              </button>
+              {hash && (
+                <div className="mt-3 text-center text-xs text-gray-500">
+                  Tx:{" "}
+                  <a
+                    href={`https://basescan.org/tx/${hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {hash.substring(0, 12)}...
+                  </a>
+                </div>
+              )}
+            </form>
+          </div>
         )}
-        {messages.length > 0
-          ? [...messages]
-              .reverse()
-              .map((msg, index) => <MessageCard key={index} message={msg} />)
-          : !areMessagesLoading && (
-              <p className="text-center text-gray-500 bg-white/50 p-6 rounded-lg">
-                Be the first to sign the guestbook!
-              </p>
-            )}
-      </div>
-    </main>
+
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold text-gray-800">
+            Messages ({totalMessages})
+          </h3>
+          {areMessagesLoading && (
+            <p className="text-center text-gray-500 py-4">
+              Loading messages...
+            </p>
+          )}
+          {messages.length > 0
+            ? [...messages]
+                .reverse()
+                .map((msg, index) => <MessageCard key={index} message={msg} />)
+            : !areMessagesLoading &&
+              !isConnected && (
+                <div className="text-center text-gray-500 bg-white p-6 rounded-xl border border-gray-200">
+                  Connect your wallet to see the guestbook.
+                </div>
+              )}
+        </div>
+      </main>
+    </div>
   );
 }

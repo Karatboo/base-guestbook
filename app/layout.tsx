@@ -8,7 +8,8 @@ const inter = Inter({ subsets: ["latin"] });
 const appUrl = "https://base-guestbook-nyaw.vercel.app/";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const SPLASH_IMAGE_URL = "https://i.ibb.co/T0gT1V7/image.png";
+  // ✅ Указываем путь к нашему локальному изображению из папки /public
+  const SPLASH_IMAGE_URL = `${appUrl}splash.png`;
 
   const miniAppManifest = {
     version: "next",
@@ -44,7 +45,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* ✅ Убираем отсюда класс фона */}
       <body className={`${inter.className}`}>
         <Providers>{children}</Providers>
       </body>

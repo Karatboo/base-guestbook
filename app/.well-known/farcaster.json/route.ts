@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  // ❗️ ЗАМЕНИ 'your-vercel-url.vercel.app' НА СВОЙ РЕАЛЬНЫЙ URL VERCEL
   const appUrl = "https://base-guestbook-nyaw.vercel.app/";
 
   const manifest = {
-    // Это поле для верификации. Мы заполним его на следующем шаге. Пока оставляем пустым.
     accountAssociation: {
       header:
         "eyJmaWQiOjQ2NzY1MCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDEzMjI0ODNkNEJENzVGYmU1N2U5QUIwNDBiNTllMTZlZTExNjgxMTQifQ",
@@ -21,13 +19,14 @@ export async function GET() {
       name: "Onchain Guestbook",
       homeUrl: appUrl,
       iconUrl: `${appUrl}icon.png`,
-      splashImageUrl: "https://i.ibb.co/FdM8931/icon.png", // И сплэш-скрин
-      splashBackgroundColor: "#0052FF",
+      // ✅ Указываем путь к нашему локальному изображению
+      splashImageUrl: `${appUrl}splash.png`,
+      splashBackgroundColor: "#F0F4F9",
       subtitle: "Leave your mark onchain.",
       description:
         "A simple and secure digital guestbook where anyone can sign a message that gets stored forever onchain. Powered by Base.",
       screenshotUrls: [
-        "https://i.ibb.co/kH10b9r/base-guestbook-screen.png", // И скриншот
+        `${appUrl}splash.png`, // Можно использовать то же изображение
       ],
       primaryCategory: "social",
       tags: ["onchain", "guestbook", "base", "social"],
