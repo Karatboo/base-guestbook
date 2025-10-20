@@ -18,7 +18,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http, createStorage } from "wagmi";
 import { base } from "wagmi/chains";
 
-// ✅ THIS IS THE FINAL, MOST ROBUST CONFIGURATION
+// ✅ THIS IS THE FINAL MOST ROBUST CONFIGURATION
 // This setup prioritizes the in-app browser wallet (like Farcaster's)
 // and provides deep links for other mobile wallets.
 const connectors = connectorsForWallets(
