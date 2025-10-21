@@ -6,15 +6,10 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import {
-  injectedWallet,
-  metaMaskWallet,
+  injectedWallet, // Наш главный приоритет
+  metaMaskWallet, // Популярные опции
   coinbaseWallet,
-  walletConnectWallet, // Импортируем как функцию
-  rabbyWallet,
-  zerionWallet,
-  trustWallet,
-  okxWallet,
-  ledgerWallet,
+  walletConnectWallet, // Запасной вариант
 } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http, createStorage } from "wagmi";
@@ -22,32 +17,32 @@ import { base } from "wagmi/chains";
 
 const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Убедитесь, что это ваш Project ID
 
-// ✅ ЭТО ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ
+// ✅ НОВЫЙ ПОДХОД: Максимальный фокус на injected и WC
 const connectors = connectorsForWallets(
   [
     {
-      groupName: "Suggested",
-      wallets: [injectedWallet, coinbaseWallet, metaMaskWallet],
-    },
-    {
-      groupName: "Popular",
+      // Единственная группа, чтобы пользователь сразу видел нужные опции
+      groupName: "Connect Wallet",
       wallets: [
-        rabbyWallet,
-        trustWallet,
-        zerionWallet,
-        okxWallet,
-        ledgerWallet,
-        walletConnectWallet, // Оставляем просто ссылку на функцию
+        // ✅ Делаем injectedWallet максимально совместимым
+        injectedWallet({
+          shimDisconnect: true, // Улучшает стабильность отключения на мобильных
+        }),
+        // Оставляем популярные кошельки
+        coinbaseWallet({
+          appName: "Onchain Guestbook",
+          preference: "smartWalletFirst",
+        }), // Coinbase Smart Wallet тоже популярен на Base
+        metaMaskWallet({ projectId, walletConnectVersion: "2" }), // Стандартный MetaMask
+        // ✅ WalletConnect как универсальный метод для остальных (Trust Wallet и т.д.)
+        // Мы передаем showQrModal: false здесь, это должно сработать по документации wagmi v2 / RainbowKit v1+
+        walletConnectWallet({ projectId, showQrModal: false }),
       ],
     },
   ],
   {
     appName: "Onchain Guestbook",
     projectId: projectId,
-    // ✅ Помещаем опцию showQrModal: false сюда, под ключом walletConnectOptions
-    walletConnectOptions: {
-      showQrModal: false, // Говорим НЕ показывать QR-код на мобильных
-    },
   }
 );
 
@@ -55,6 +50,7 @@ const config = createConfig({
   connectors,
   chains: [base],
   transports: { [base.id]: http() },
+  // Оставляем все "фичи" для стабильности
   multiInjectedProviderDiscovery: true,
   storage: createStorage({
     storage: typeof window !== "undefined" ? window.localStorage : undefined,
@@ -68,6 +64,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
+        {/* Оставляем компактный режим */}
         <RainbowKitProvider modalSize="compact">{children}</RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
