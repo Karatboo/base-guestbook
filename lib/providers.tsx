@@ -29,7 +29,10 @@ const configuredInjectedWallet = injectedWallet();
 
 const configuredWalletConnect = walletConnectWallet({
   projectId,
-  showQrModal: false, // Говорим НЕ показывать QR-код на мобильных
+  options: {
+    // 👈 НУЖНО ОБЕРНУТЬ В 'options'
+    showQrModal: false, // Говорим НЕ показывать QR-код на мобильных
+  },
 });
 
 // ✅ 3. Используем КОНФИГУРИРОВАННЫЕ функции в connectorsForWallets
