@@ -9,7 +9,7 @@ import {
   injectedWallet,
   metaMaskWallet,
   coinbaseWallet,
-  walletConnectWallet, // Keep this import as is
+  walletConnectWallet, // Импортируем как есть
   rabbyWallet,
   zerionWallet,
   trustWallet,
@@ -20,8 +20,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http, createStorage } from "wagmi";
 import { base } from "wagmi/chains";
 
-const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Make sure this is your Project ID
+const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Убедитесь, что это ваш Project ID
 
+// ✅ ЭТО КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
 const connectors = connectorsForWallets(
   [
     {
@@ -36,18 +37,18 @@ const connectors = connectorsForWallets(
         zerionWallet,
         okxWallet,
         ledgerWallet,
-        walletConnectWallet, // Keep the function reference here
+        // ✅ Применяем опцию showQrModal: false прямо здесь
+        walletConnectWallet({
+          projectId,
+          showQrModal: false, // Говорим НЕ показывать QR-код на мобильных
+        }),
       ],
     },
   ],
   {
     appName: "Onchain Guestbook",
     projectId: projectId,
-    // ✅ THIS IS THE CORRECT WAY TO APPLY WC OPTIONS
-    // We add the walletConnectParameters here
-    walletConnectParameters: {
-      showQrModal: false, // Tell WC not to show QR on mobile by default
-    },
+    // ❌ Убираем walletConnectParameters отсюда, так как опция переехала
   }
 );
 
