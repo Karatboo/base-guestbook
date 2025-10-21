@@ -20,19 +20,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http, createStorage } from "wagmi";
 import { base } from "wagmi/chains";
 
-// ✅ THIS IS THE KEY FIX
-// Configure WalletConnect to hide the QR code on mobile devices
 const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Make sure this is your Project ID
 
 const connectors = connectorsForWallets(
   [
     {
       groupName: "Suggested",
-      wallets: [
-        injectedWallet, // Priority for Farcaster in-app wallet
-        coinbaseWallet,
-        metaMaskWallet,
-      ],
+      wallets: [injectedWallet, coinbaseWallet, metaMaskWallet],
     },
     {
       groupName: "Popular",
@@ -42,17 +36,18 @@ const connectors = connectorsForWallets(
         zerionWallet,
         okxWallet,
         ledgerWallet,
-        // Explicitly configure WalletConnect for better mobile handling
-        walletConnectWallet({
-          projectId,
-          showQrModal: false, // This tells WC NOT to show QR on mobile
-        }),
+        walletConnectWallet, // Keep the function reference here
       ],
     },
   ],
   {
     appName: "Onchain Guestbook",
-    projectId: projectId, // Use the projectId defined above
+    projectId: projectId,
+    // ✅ THIS IS THE CORRECT WAY TO APPLY WC OPTIONS
+    // We add the walletConnectParameters here
+    walletConnectParameters: {
+      showQrModal: false, // Tell WC not to show QR on mobile by default
+    },
   }
 );
 
