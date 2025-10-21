@@ -9,7 +9,7 @@ import {
   injectedWallet,
   metaMaskWallet,
   coinbaseWallet,
-  walletConnectWallet, // Импортируем как есть
+  walletConnectWallet, // Импортируем как функцию
   rabbyWallet,
   zerionWallet,
   trustWallet,
@@ -22,7 +22,7 @@ import { base } from "wagmi/chains";
 
 const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Убедитесь, что это ваш Project ID
 
-// ✅ ЭТО КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
+// ✅ ЭТО ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ
 const connectors = connectorsForWallets(
   [
     {
@@ -37,18 +37,17 @@ const connectors = connectorsForWallets(
         zerionWallet,
         okxWallet,
         ledgerWallet,
-        // ✅ Применяем опцию showQrModal: false прямо здесь
-        walletConnectWallet({
-          projectId,
-          showQrModal: false, // Говорим НЕ показывать QR-код на мобильных
-        }),
+        walletConnectWallet, // Оставляем просто ссылку на функцию
       ],
     },
   ],
   {
     appName: "Onchain Guestbook",
     projectId: projectId,
-    // ❌ Убираем walletConnectParameters отсюда, так как опция переехала
+    // ✅ Помещаем опцию showQrModal: false сюда, под ключом walletConnectOptions
+    walletConnectOptions: {
+      showQrModal: false, // Говорим НЕ показывать QR-код на мобильных
+    },
   }
 );
 
