@@ -9,42 +9,50 @@ import {
   injectedWallet,
   metaMaskWallet,
   coinbaseWallet,
-  walletConnectWallet,
-  trustWallet, // ✅ We'll explicitly add Trust Wallet for better detection
+  walletConnectWallet, // Keep this import as is
   rabbyWallet,
   zerionWallet,
+  trustWallet,
+  okxWallet,
+  ledgerWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http, createStorage } from "wagmi";
 import { base } from "wagmi/chains";
 
-// ✅ THIS IS THE FINAL MOST ROBUST CONFIGURATION
-// This setup prioritizes the in-app browser wallet (like Farcaster's)
-// and provides deep links for other mobile wallets.
+// ✅ THIS IS THE KEY FIX
+// Configure WalletConnect to hide the QR code on mobile devices
+const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Make sure this is your Project ID
+
 const connectors = connectorsForWallets(
   [
     {
       groupName: "Suggested",
       wallets: [
-        injectedWallet, // This is CRITICAL for the Farcaster in-app wallet
-        coinbaseWallet, // Has good mobile integration
-        metaMaskWallet, // A popular choice
+        injectedWallet, // Priority for Farcaster in-app wallet
+        coinbaseWallet,
+        metaMaskWallet,
       ],
     },
     {
-      groupName: "Other Wallets",
+      groupName: "Popular",
       wallets: [
-        trustWallet,
         rabbyWallet,
+        trustWallet,
         zerionWallet,
-        walletConnectWallet, // This will now correctly open other apps on mobile
+        okxWallet,
+        ledgerWallet,
+        // Explicitly configure WalletConnect for better mobile handling
+        walletConnectWallet({
+          projectId,
+          showQrModal: false, // This tells WC NOT to show QR on mobile
+        }),
       ],
     },
   ],
   {
     appName: "Onchain Guestbook",
-    // Make sure this is your correct Project ID
-    projectId: "9938872d5c52cb2a3e117c606d1dec14", 
+    projectId: projectId, // Use the projectId defined above
   }
 );
 
@@ -52,11 +60,10 @@ const config = createConfig({
   connectors,
   chains: [base],
   transports: { [base.id]: http() },
-  // This forces wagmi to actively look for ALL injected wallets on mobile
   multiInjectedProviderDiscovery: true,
-  // This ensures the connection state persists after a page refresh
-  storage: createStorage({ storage: typeof window !== 'undefined' ? window.localStorage : undefined }),
-  // Required for Next.js to prevent hydration errors
+  storage: createStorage({
+    storage: typeof window !== "undefined" ? window.localStorage : undefined,
+  }),
   ssr: true,
 });
 
@@ -67,7 +74,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider modalSize="compact">{children}</RainbowKitProvider>
-      </Query-ClientProvider>
+      </QueryClientProvider>
     </WagmiProvider>
   );
 }
