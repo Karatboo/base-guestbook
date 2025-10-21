@@ -1,4 +1,3 @@
-// lib/providers.tsx
 "use client";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
@@ -23,12 +22,10 @@ import { base } from "wagmi/chains";
 
 const projectId = "9938872d5c52cb2a3e117c606d1dec14"; // Убедитесь, что это ваш Project ID
 
-// ✅ 2. СОЗДАЕМ КОНФИГУРИРОВАННЫЕ ВЕРСИИ КОШЕЛЬКОВ (ПРАВИЛЬНЫЙ СПОСОБ)
-// Мы создаем новые функции, которые вызывают оригинальные с нужными параметрами.
+// ✅ 2. СОЗДАЕМ КОНФИГУРИРОВАННЫЕ ВЕРСИИ КОШЕЛЬКОВ
 
-const configuredInjectedWallet = injectedWallet({
-  shimDisconnect: true, // Улучшает стабильность отключения на мобильных
-});
+// ОШИБКА БЫЛА ЗДЕСЬ: injectedWallet() не принимает аргументов
+const configuredInjectedWallet = injectedWallet();
 
 const configuredWalletConnect = walletConnectWallet({
   projectId,
@@ -46,7 +43,12 @@ const connectors = connectorsForWallets(
           appName: "Onchain Guestbook",
           preference: "smartWalletFirst",
         }),
-        metaMaskWallet({ projectId, walletConnectVersion: "2" }),
+        // ПЕРЕМЕСТИЛИ shimDisconnect СЮДА:
+        metaMaskWallet({
+          projectId,
+          walletConnectVersion: "2",
+          shimDisconnect: true, // Улучшает стабильность отключения
+        }),
       ],
     },
     {
@@ -67,7 +69,7 @@ const connectors = connectorsForWallets(
   }
 );
 
-// ✅ 4. Конфигурация Wagmi остается прежней (она уже правильная)
+// ✅ 4. Конфигурация Wagmi остается прежней
 const config = createConfig({
   connectors,
   chains: [base],
